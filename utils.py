@@ -93,7 +93,7 @@ segmentos da imagem;
 lista zipada com as classes, que são a lesão e a não lesão;
 nome do arquivo que será gerado. por padrão se chamará tst
 """
-def create_result_image(segments, classes, caminho, name='tst'):
+def create_result_image(segments, classes, name='tst'):
     shape = segments.shape
     result = np.zeros((shape[0], shape[1], 3), dtype=int)
     result[:,:,2].fill(255)
@@ -109,7 +109,7 @@ def create_result_image(segments, classes, caminho, name='tst'):
                 result[i][j][2] = 0
                 result[i][j][0] = 255
 
-    imsave(caminho + 'saved_data/result/' + name + '.png', img_as_ubyte(result))
+    imsave('saved_data/result/' + name + '.png', img_as_ubyte(result))
 
 """
 Função responsável por criar uma imagem resultante da classificação, onde essa imagem será terá apenas o fundo verde da classe saudável.
@@ -119,7 +119,7 @@ segmentos da imagem;
 lista zipada com as classes, que são a lesão e a não lesão;
 nome do arquivo que será gerado. por padrão se chamará tst2
 """
-def create_result_image_pos_processing(segments, classes, caminho, name='tst2'):
+def create_result_image_pos_processing(segments, classes, name='tst2'):
     shape = segments.shape
     result = np.zeros((shape[0], shape[1], 3), dtype=int)
     result[:,:,2].fill(255)
@@ -135,7 +135,7 @@ def create_result_image_pos_processing(segments, classes, caminho, name='tst2'):
                 result[i][j][2] = 0
                 result[i][j][1] = 255
 
-    imsave(caminho + 'saved_data/result/' + name + '.png', img_as_ubyte(result))
+    imsave('saved_data/result/' + name + '.png', img_as_ubyte(result))
 
 """
 Função responsável por gerar uma imagem do treino da imagem.
@@ -144,9 +144,9 @@ segmentos da imagem;
 lista zipada com as classes, que são a lesão e a não lesão;
 nome do arquivo que será gerado. por padrão se chamará tst2
 """
-def tcc_train_image(segments, classes, caminho, name='tst'):
+def tcc_train_image(segments, classes, name='tst'):
     shape = segments.shape
-    result = img_as_ubyte(imread(caminho + 'saved_data/superpixels.png'))
+    result = img_as_ubyte(imread('saved_data/superpixels.png'))
     
     ones = [i[0] for i in classes if i[1] == 1]
     twos = [i[0] for i in classes if i[1] == 2]
@@ -162,9 +162,9 @@ def tcc_train_image(segments, classes, caminho, name='tst'):
                 result[i][j][1] = 0
                 result[i][j][0] = 255
 
-    imsave(caminho + 'saved_data/result/' + name + '.png', img_as_ubyte(result))
+    imsave('saved_data/result/' + name + '.png', img_as_ubyte(result))
 
-def override_result(original, segments, classes, caminho, name='ovr'):
+def override_result(original, segments, classes, name='ovr'):
     shape = segments.shape
     result = original
     ones = [i[0] for i in classes if i[1] == 1]
@@ -177,7 +177,7 @@ def override_result(original, segments, classes, caminho, name='ovr'):
                 result[i][j][1] = 0
                 result[i][j][0] = 255
 
-    imsave(caminho + 'saved_data/' + name + '.png', img_as_ubyte(result))
+    imsave('saved_data/' + name + '.png', img_as_ubyte(result))
 
 def mask_result_image(segments, classes, true_value):
     shape = segments.shape

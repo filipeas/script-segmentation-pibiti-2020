@@ -25,126 +25,128 @@ import os, csv, time
 import numpy as np
 import sys
 
-# Porcentagens de dados das imagens usadas para treino.
-percentages = [
-    # 0.01,
-    # 0.05,
-    # 0.1,
-    # 0.15,
-    # 0.2,
-    0.25,
-    # 0.3,
-    # 0.35,
-    # 0.4,
-    # 0.5
-]
+def index(original, marcada):
+    # Porcentagens de dados das imagens usadas para treino.
+    percentages = [
+        # 0.01,
+        # 0.05,
+        # 0.1,
+        # 0.15,
+        # 0.2,
+        0.25,
+        # 0.3,
+        # 0.35,
+        # 0.4,
+        # 0.5
+    ]
 
-# Quantidade de segmentos para o superpixel
-qtdSegments = [
-    1500,
-    # 2000,
-    # 2500,
-    # 3000,
-    # 4000,
-    # 5000
-]
+    # Quantidade de segmentos para o superpixel
+    qtdSegments = [
+        1500,
+        # 2000,
+        # 2500,
+        # 3000,
+        # 4000,
+        # 5000
+    ]
 
-# Tenta encontrar o diretório results. Se ele não existir, o cria.
-results_path = 'results/'
-if not os.path.exists(results_path):
-    os.makedirs(results_path)
+    # Tenta encontrar o diretório results. Se ele não existir, o cria.
+    results_path = 'results/'
+    if not os.path.exists(results_path):
+        os.makedirs(results_path)
 
-# Cria a estrutura de dados que irá guardar os resultados das médias das execuções para todas as imagens e para todas as métricas.
-# Funciona como uma matriz  de (Nª de porcentagenx utilizadas)x(número de métricas, que no caso são 4).
-# No final, essa estrutura é utilizada para calcular a média das médias de cada porcentagem de dados pra treino.
-total_means = [[[],[],[],[]] for i in range(len(percentages))]
+    # Cria a estrutura de dados que irá guardar os resultados das médias das execuções para todas as imagens e para todas as métricas.
+    # Funciona como uma matriz  de (Nª de porcentagenx utilizadas)x(número de métricas, que no caso são 4).
+    # No final, essa estrutura é utilizada para calcular a média das médias de cada porcentagem de dados pra treino.
+    total_means = [[[],[],[],[]] for i in range(len(percentages))]
 
-# instanciando variavel pra guardar todas as acuracias da imagem corrente
-acuracia_corrent = [[[],[],[],[],[]] for i in range(len(percentages))]
+    # instanciando variavel pra guardar todas as acuracias da imagem corrente
+    acuracia_corrent = [[[],[],[],[],[]] for i in range(len(percentages))]
 
-# instanciando variavel pra guardar todas as sensibilidade da imagem corrente
-sensibilidade_corrent = [[[],[],[],[],[]] for i in range(len(percentages))]
+    # instanciando variavel pra guardar todas as sensibilidade da imagem corrente
+    sensibilidade_corrent = [[[],[],[],[],[]] for i in range(len(percentages))]
 
-# instanciando variavel pra guardar todas as especificidade da imagem corrente
-especificidade_corrent = [[[],[],[],[],[]] for i in range(len(percentages))]
+    # instanciando variavel pra guardar todas as especificidade da imagem corrente
+    especificidade_corrent = [[[],[],[],[],[]] for i in range(len(percentages))]
 
-# instanciando variavel pra guardar todas as dice da imagem corrente
-dice_corrent = [[[],[],[],[],[]] for i in range(len(percentages))]
+    # instanciando variavel pra guardar todas as dice da imagem corrente
+    dice_corrent = [[[],[],[],[],[]] for i in range(len(percentages))]
 
-print(f'\n\n########### Executando a imagem ############\n\n')
+    print(f'\n\n########### Executando a imagem ############\n\n')
 
-# Marcando o tempo de execução.
-start = time.time()
+    # Marcando o tempo de execução.
+    start = time.time()
 
-# Abrindo a imagem original e a imagem marcada.
-path = f'{sys.argv[2]}' # original
-path_marked = f'{sys.argv[3]}' # marcada
+    # Abrindo a imagem original e a imagem marcada.
+    path = f'{original}' # original
+    path_marked = f'{marcada}' # marcada
 
-print(path + '\n' + path_marked)
+    print(path + '\n' + path_marked)
 
-# iterando sobre a quantidade de segmentos de imagem para o superpixel
-for segment in qtdSegments:
-    # Executa a primeira etapa do algoritmo, responsável pela separação dos superpixels da imagem (arquivo main.py).
-    vsf(path, path_marked, segment, sys.argv[1])
+    # iterando sobre a quantidade de segmentos de imagem para o superpixel
+    for segment in qtdSegments:
+        # Executa a primeira etapa do algoritmo, responsável pela separação dos superpixels da imagem (arquivo main.py).
+        vsf(path, path_marked, segment)
 
-    # Executa a segunda etapa do algoritmo, responsável pela extração de características de cada superpixel gerado na etapa anterior.
-    # Disponível no arquivo features_extraction.py
-    ftet(sys.argv[1])
+        # Executa a segunda etapa do algoritmo, responsável pela extração de características de cada superpixel gerado na etapa anterior.
+        # Disponível no arquivo features_extraction.py
+        ftet()
 
-    # Para cada percentual:
-    for index, percent in enumerate(percentages):
-        
-        # Cria uma estrutura de dados para salvar os resultados e posteriormente calcular as médias das métricas
-        metrics_media = [[], [], [], []]
+        # Para cada percentual:
+        for index, percent in enumerate(percentages):
+            
+            # Cria uma estrutura de dados para salvar os resultados e posteriormente calcular as médias das métricas
+            metrics_media = [[], [], [], []]
 
-        # Executa 5 vezes para depois tirar a média (5 vezes pois são 5 métricas diferentes)
-        for i in range(1):
+            # Executa 5 vezes para depois tirar a média (5 vezes pois são 5 métricas diferentes)
+            for i in range(1):
 
-            # Terceira etapa do algoritmo:
-            # Usa as características extraídas na etapa anterior para classificar e gerar as métricas para cada imagem
-            # Disponível no arquivo select_and_classify.py
-            acc, sen, spe, dice = classify(sys.argv[1], percent) # classificação por Random Forest
-            # acc, sen, spe, dice = select_random_seeds(image, percent) # classificação por sfc-means
+                # Terceira etapa do algoritmo:
+                # Usa as características extraídas na etapa anterior para classificar e gerar as métricas para cada imagem
+                # Disponível no arquivo select_and_classify.py
+                acc, sen, spe, dice = classify(percent) # classificação por Random Forest
+                # acc, sen, spe, dice = select_random_seeds(image, percent) # classificação por sfc-means
 
-            # Coloca as métricas na estrutura de dados
-            metrics_media[0].append(acc)
-            metrics_media[1].append(sen)
-            metrics_media[2].append(spe)
-            metrics_media[3].append(dice)
+                # Coloca as métricas na estrutura de dados
+                metrics_media[0].append(acc)
+                metrics_media[1].append(sen)
+                metrics_media[2].append(spe)
+                metrics_media[3].append(dice)
 
-        # Depois adiciona na estrutura de dados os dados gerais        
-        total_means[index][0].append(mean(metrics_media[0])*100) # acuracia
-        total_means[index][1].append(mean(metrics_media[1])*100) # sensibilidade
-        total_means[index][2].append(mean(metrics_media[2])*100) # especificidade
-        total_means[index][3].append(mean(metrics_media[3])) # dice
+            # Depois adiciona na estrutura de dados os dados gerais        
+            total_means[index][0].append(mean(metrics_media[0])*100) # acuracia
+            total_means[index][1].append(mean(metrics_media[1])*100) # sensibilidade
+            total_means[index][2].append(mean(metrics_media[2])*100) # especificidade
+            total_means[index][3].append(mean(metrics_media[3])) # dice
 
-        if(segment == 1500):
-            acuracia_corrent[index][0].append(mean(metrics_media[0])*100)
-            sensibilidade_corrent[index][0].append(mean(metrics_media[1])*100)
-            especificidade_corrent[index][0].append(mean(metrics_media[2])*100)
-            dice_corrent[index][0].append(mean(metrics_media[3])*100)
-        elif(segment == 2000):
-            acuracia_corrent[index][1].append(mean(metrics_media[0])*100)
-            sensibilidade_corrent[index][1].append(mean(metrics_media[1])*100)
-            especificidade_corrent[index][1].append(mean(metrics_media[2])*100)
-            dice_corrent[index][1].append(mean(metrics_media[3])*100)
-        elif(segment == 2500):
-            acuracia_corrent[index][2].append(mean(metrics_media[0])*100)
-            sensibilidade_corrent[index][2].append(mean(metrics_media[1])*100)
-            especificidade_corrent[index][2].append(mean(metrics_media[2])*100)
-            dice_corrent[index][2].append(mean(metrics_media[3])*100)
-        elif(segment == 3000):
-            acuracia_corrent[index][3].append(mean(metrics_media[0])*100)
-            sensibilidade_corrent[index][3].append(mean(metrics_media[1])*100)
-            especificidade_corrent[index][3].append(mean(metrics_media[2])*100)
-            dice_corrent[index][3].append(mean(metrics_media[3])*100)
-        elif(segment == 4000):
-            acuracia_corrent[index][4].append(mean(metrics_media[0])*100)
-            sensibilidade_corrent[index][4].append(mean(metrics_media[1])*100)
-            especificidade_corrent[index][4].append(mean(metrics_media[2])*100)
-            dice_corrent[index][4].append(mean(metrics_media[3])*100)
+            if(segment == 1500):
+                acuracia_corrent[index][0].append(mean(metrics_media[0])*100)
+                sensibilidade_corrent[index][0].append(mean(metrics_media[1])*100)
+                especificidade_corrent[index][0].append(mean(metrics_media[2])*100)
+                dice_corrent[index][0].append(mean(metrics_media[3])*100)
+            elif(segment == 2000):
+                acuracia_corrent[index][1].append(mean(metrics_media[0])*100)
+                sensibilidade_corrent[index][1].append(mean(metrics_media[1])*100)
+                especificidade_corrent[index][1].append(mean(metrics_media[2])*100)
+                dice_corrent[index][1].append(mean(metrics_media[3])*100)
+            elif(segment == 2500):
+                acuracia_corrent[index][2].append(mean(metrics_media[0])*100)
+                sensibilidade_corrent[index][2].append(mean(metrics_media[1])*100)
+                especificidade_corrent[index][2].append(mean(metrics_media[2])*100)
+                dice_corrent[index][2].append(mean(metrics_media[3])*100)
+            elif(segment == 3000):
+                acuracia_corrent[index][3].append(mean(metrics_media[0])*100)
+                sensibilidade_corrent[index][3].append(mean(metrics_media[1])*100)
+                especificidade_corrent[index][3].append(mean(metrics_media[2])*100)
+                dice_corrent[index][3].append(mean(metrics_media[3])*100)
+            elif(segment == 4000):
+                acuracia_corrent[index][4].append(mean(metrics_media[0])*100)
+                sensibilidade_corrent[index][4].append(mean(metrics_media[1])*100)
+                especificidade_corrent[index][4].append(mean(metrics_media[2])*100)
+                dice_corrent[index][4].append(mean(metrics_media[3])*100)
 
-# calcula o tempo de execução do algoritmo para a imagem atual.
-end = time.time()
-print(f'\n\n########### Fim da execucao da imagem no tempo de {end-start} segundos ############\n\n')
-print("Result = ", acuracia_corrent[0][0], sensibilidade_corrent[0][0], especificidade_corrent[0][0], dice_corrent[0][0], " Fim")
+    # calcula o tempo de execução do algoritmo para a imagem atual.
+    end = time.time()
+    print(f'\n\n########### Fim da execucao da imagem no tempo de {end-start} segundos ############\n\n')
+    print("Result = ", acuracia_corrent[0][0], sensibilidade_corrent[0][0], especificidade_corrent[0][0], dice_corrent[0][0], " Fim")
+    return acuracia_corrent[0][0], sensibilidade_corrent[0][0], especificidade_corrent[0][0], dice_corrent[0][0]

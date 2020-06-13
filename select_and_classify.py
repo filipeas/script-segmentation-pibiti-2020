@@ -233,7 +233,7 @@ percentage -> porcentagem de treino;
 @ returns: 
 retorna todas as medidas (acuracia, sensibilidade, especificidade e dice);
 """
-def classify(caminho, percentage=0.25):
+def classify(percentage=0.25):
     healthy_props, disease_props, healthy_sp, disease_sp, segments = read_features_file()
     healthy_indexes = [i for i in range(0, len(healthy_props))]
     disease_indexes = [i for i in range(0, len(disease_props))]
@@ -277,7 +277,7 @@ def classify(caminho, percentage=0.25):
 
     full_sp = np.concatenate((healthy_sp, disease_sp))
     #create_result_image(segments, list(zip(full_sp, result_healthy)), 'train_image')
-    tcc_train_image(segments, list(zip(full_sp, result_healthy)), caminho, 'train_image')
+    tcc_train_image(segments, list(zip(full_sp, result_healthy)), 'train_image')
     
     # random forest
     clf = RandomForestClassifier(n_estimators=30) # usando Random Forest
@@ -320,7 +320,7 @@ def classify(caminho, percentage=0.25):
     # print("result_disease",result_disease)
     # exit()
 
-    marks_file = open(caminho + 'saved_data/marked_areas.npz', 'rb')
+    marks_file = open('saved_data/marked_areas.npz', 'rb')
     marks_data = np.load(marks_file)
     healthy_mark = marks_data['healthy']
     disease_mark = marks_data['disease']
@@ -333,7 +333,7 @@ def classify(caminho, percentage=0.25):
     # print(result_healthy)
 
     full_sp = np.concatenate((healthy_sp, disease_sp))
-    create_result_image(segments, list(zip(full_sp, result_healthy)), caminho, 'tcc_result')
+    create_result_image(segments, list(zip(full_sp, result_healthy)), 'tcc_result')
     
     result_healthy_mask = mask_result_image(segments, list(zip(healthy_sp, result_healthy)), 1)
     result_disease_mask = mask_result_image(segments, list(zip(disease_sp, result_disease)), 2)
@@ -341,13 +341,13 @@ def classify(caminho, percentage=0.25):
     #imsave('saved_data/result/pos_processed_mask.png', img_as_ubyte(pos_processed))
 
     # gerando imagem do pós processamento
-    create_result_image_pos_processing(segments, list(zip(full_sp, result_healthy)), caminho, 'fundo_sem_lesao')
-    img_original = img_as_ubyte(imread(caminho + 'saved_data/result/fundo_sem_lesao.png'))
+    create_result_image_pos_processing(segments, list(zip(full_sp, result_healthy)), 'fundo_sem_lesao')
+    img_original = img_as_ubyte(imread('saved_data/result/fundo_sem_lesao.png'))
     overrided = override_mask(img_original, pos_processed)
-    imsave(caminho + 'saved_data/result/override_pos_processing.png', img_as_ubyte(overrided))
+    imsave('saved_data/result/override_pos_processing.png', img_as_ubyte(overrided))
 
-    imsave(caminho + 'saved_data/result/result_healthy_mask.png', img_as_ubyte(result_healthy_mask))
-    imsave(caminho + 'saved_data/result/result_disease_mask.png', img_as_ubyte(result_disease_mask))
+    imsave('saved_data/result/result_healthy_mask.png', img_as_ubyte(result_healthy_mask))
+    imsave('saved_data/result/result_disease_mask.png', img_as_ubyte(result_disease_mask))
 
     tp, tn, fp, fn = calculate_confusion_matrix(disease_mark, pos_processed, healthy_mark, result_healthy_mask)
     dice = calculate_dice(disease_mark, pos_processed)

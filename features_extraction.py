@@ -12,10 +12,10 @@
 from data_preparing import *
 import numpy as np
 
-def ftet(caminho):
+def ftet():
 
     # Lê o arquivo gerado na etapa anterior:
-    superpixels_file = open(caminho + 'saved_data/superpixels.npz', 'rb')
+    superpixels_file = open('saved_data/superpixels.npz', 'rb')
     data_file = np.load(superpixels_file, allow_pickle=True)
 
     # Lê as imagens dos superpixels extraidos
@@ -29,6 +29,6 @@ def ftet(caminho):
 
     # Salva os dados em um arquivo numpy
     # Os dados são: características dos superpixels saudáveis e características dos superpixels doentes
-    features_file = open(caminho + 'saved_data/features.npz', 'wb')
+    features_file = open('saved_data/features.npz', 'wb')
     np.savez(features_file, healthy=healthy_props, disease=disease_props)
     features_file.close()

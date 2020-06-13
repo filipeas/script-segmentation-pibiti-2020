@@ -16,8 +16,7 @@ from superpixels_extraction import * # responsável por extrair os superpixels d
 import sys, time, multiprocessing as mp
 import numpy as np
 
-# A função recebe o caminho da imagem original e da imagem marcada:
-def vsf(path, path_marked, segment, caminho):
+def vsf(path, path_marked, segment):
 
     # Lendo as imagens
     img_original = img_as_ubyte(imread(path))
@@ -28,7 +27,7 @@ def vsf(path, path_marked, segment, caminho):
     segments = slic(img_original, n_segments = segment)
 
     # Salva a imagem dos superpixels na pasta de dados salvos
-    imsave(caminho + 'saved_data/superpixels.png', mark_boundaries(img_original, segments))
+    imsave('saved_data/superpixels.png', mark_boundaries(img_original, segments))
 
     # Segmenta as áreas doentes e saudáveis com base na marcação do médico
     # Função disponível no arquivo utils.py
@@ -65,7 +64,7 @@ def vsf(path, path_marked, segment, caminho):
     # todos os superpixels gerados pelo slic;
     # superpixels saudáveis (imagem);
     # superpixels doentes (imagem);
-    superpixels_file = open(caminho + 'saved_data/superpixels.npz', 'wb')
+    superpixels_file = open('saved_data/superpixels.npz', 'wb')
     np.savez(superpixels_file, ht_superpixels = healthy_superpixels, ds_superpixels = disease_superpixels, segments = segments, ht_boxes = healthy_boxes, ds_boxes = disease_boxes)
     superpixels_file.close()
 
@@ -73,6 +72,6 @@ def vsf(path, path_marked, segment, caminho):
     # Os dados são:
     # área saudável; e
     # área doente;
-    superpixels_file = open(caminho + 'saved_data/marked_areas.npz', 'wb')
+    superpixels_file = open('saved_data/marked_areas.npz', 'wb')
     np.savez(superpixels_file, healthy = healthy, disease = disease)
     superpixels_file.close()
